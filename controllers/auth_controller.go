@@ -6,6 +6,7 @@ import (
 	"github.com/muhammadjon1304/e-commerce/models"
 	"github.com/muhammadjon1304/e-commerce/repositories"
 	"github.com/muhammadjon1304/e-commerce/utils"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
@@ -40,6 +41,33 @@ func (u *UserController) Register(ctx *gin.Context) {
 	}
 }
 
-func Login() {
+func (u *UserController) Login(c *gin.Context) {
+	var user models.LoginUser
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var user_db models.User
+	repository := repositories.NewUserRepository(u.DB)
+	user_db = repository.GetUserByUsername(user.Username)
 
+	if err := bcrypt.CompareHashAndPassword([]byte(user_db.Password_hash), []byte(user.Password_hash)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+	token := utils.GenerateJWT(user_db)
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func (u *UserController) GetProfile(c *gin.Context) {
+	username, exist := c.Get("username")
+	if !exist {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to get username"})
+		return
+	}
+	dbuser := repositories.NewUserRepository(u.DB)
+	user := dbuser.GetUserByUsername(username.(string))
+
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }

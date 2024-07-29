@@ -31,3 +31,31 @@ func (u *UserRepository) SaveUser(user models.User) bool {
 	}
 	return true
 }
+
+func (u *UserRepository) GetUserByUsername(username string) models.User {
+	query, err := u.DB.Query("SELECT id,username,email,password_hash,role FROM users WHERE username=$1", username)
+
+	if err != nil {
+		log.Fatal(err)
+		return models.User{}
+	}
+	var user models.User
+
+	if query != nil {
+		for query.Next() {
+			var (
+				id       uint
+				username string
+				email    string
+				password string
+				role     string
+			)
+			err := query.Scan(&id, &username, &email, &password, &role)
+			if err != nil {
+				log.Fatal(err)
+			}
+			user = models.User{id, username, email, password, role}
+		}
+	}
+	return user
+}

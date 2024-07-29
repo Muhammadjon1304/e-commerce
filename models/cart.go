@@ -1,6 +1,6 @@
 package models
 
 type Cart struct {
-	ID      string `json:"id"`
-	User_id string `json:"user_id"`
+	ID      uint `json:"id"`
+	User_id uint `json:"user_id"`
 }

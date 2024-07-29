@@ -1,8 +1,8 @@
 package models
 
 type Order struct {
-	ID           string `json:"id"`
-	User_id      string `json:"user"`
-	Total_amount uint   `json:"total_amount"`
-	Status       string `json:"status"`
+	ID           uint    `json:"id"`
+	User_id      uint    `json:"user"`
+	Total_amount float64 `json:"total_amount"`
+	Status       string  `json:"status"`
 }
