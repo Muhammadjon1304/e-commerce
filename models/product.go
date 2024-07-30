@@ -8,3 +8,7 @@ type Product struct {
 	Stock       float64 `json:"stock"`
 	Image_url   string  `json:"image_url"`
 }
+
+type ProductURI struct {
+	ID uint `uri:"id" binding:"required,number"`
+}

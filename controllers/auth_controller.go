@@ -67,7 +67,7 @@ func (u *UserController) GetProfile(c *gin.Context) {
 		return
 	}
 	dbuser := repositories.NewUserRepository(u.DB)
-	user := dbuser.GetUserByUsername(username.(string))
+	user := dbuser.GetUserByUsernameForUser(username.(string))
 
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
