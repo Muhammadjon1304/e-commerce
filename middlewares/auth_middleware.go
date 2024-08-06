@@ -75,7 +75,7 @@ func AdminMiddleware() gin.HandlerFunc {
 			}
 			return []byte(jwtSecret), nil
 		})
-		
+
 		if err != nil || !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()

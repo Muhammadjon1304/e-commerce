@@ -14,7 +14,13 @@ func main() {
 	router := gin.Default()
 	UserController := controllers.NewUserController(db)
 	ProductController := controllers.NewProductController(db)
+	CategoryController := controllers.NewCategoryController(db)
+	OrderController := controllers.NewOrderController(db)
+	CartController := controllers.NewCartController(db)
 	routes.UserRoutes(router, &UserController)
 	routes.ProductRoutes(router, &ProductController)
+	routes.CategoryRoutes(router, &CategoryController)
+	routes.OrderRoutes(router, &OrderController)
+	routes.CartRoutes(router,&CartController)
 	router.Run(":8080")
 }

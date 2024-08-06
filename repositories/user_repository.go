@@ -86,3 +86,27 @@ func (u *UserRepository) GetUserByUsernameForUser(username string) models.User {
 	}
 	return user
 }
+
+func (u *UserRepository) GetUserIDByUsername(username string) uint {
+	query, err := u.DB.Query("SELECT id FROM users WHERE username=$1", username)
+
+	if err != nil {
+		log.Fatal(err)
+		return 0
+	}
+	var id uint
+
+	if query != nil {
+		for query.Next() {
+			var (
+				user_id uint
+			)
+			err := query.Scan(&user_id)
+			if err != nil {
+				log.Fatal(err)
+			}
+			id = user_id
+		}
+	}
+	return id
+}

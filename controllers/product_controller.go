@@ -94,3 +94,65 @@ func (p *ProductController) UpdateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "error": "Can't get product"})
 	}
 }
+
+func (o *ProductController) AddCategory(c *gin.Context) {
+	db := o.DB
+	var ProductID models.ProductURI
+	var CategoryID models.Category
+
+	if err := c.ShouldBindUri(&ProductID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
+	if err := c.ShouldBindUri(&CategoryID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
+	repository := repositories.NewCategoryRepository(db)
+	exist, err := repository.CheckCategoryProductRelationship(ProductID.ID, CategoryID.ID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+	if exist {
+		if added := repository.AddCategoryToProduct(ProductID.ID, CategoryID.ID); added {
+			c.JSON(200, gin.H{"status": "success", "message": "category added"})
+			return
+		} else {
+			c.JSON(300, gin.H{"status": "fail", "message": "can't add category"})
+			return
+		}
+	} else {
+		c.JSON(300, gin.H{"status": "fail", "message": "No this kind of category or product"})
+		return
+	}
+
+}
+
+func (o *ProductController) DeleteCategory(c *gin.Context) {
+	db := o.DB
+	var ProductID models.ProductURI
+	var CategoryID models.CategoryURI
+
+	if err := c.ShouldBindUri(&ProductID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
+	if err := c.ShouldBindUri(&CategoryID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
+	repository := repositories.NewCategoryRepository(db)
+	exist, err := repository.CheckCategoryProductRelationship(ProductID.ID, CategoryID.ID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+	if exist {
+		if deleted := repository.DeleteCategoryProductRelationship(ProductID.ID, CategoryID.ID); deleted {
+			c.JSON(200, gin.H{"status": "success", "message": "category added"})
+			return
+		} else {
+			c.JSON(300, gin.H{"status": "fail", "message": "can't add category"})
+			return
+		}
+	} else {
+		c.JSON(300, gin.H{"status": "fail", "message": "No this kind of category or product"})
+		return
+	}
+
+}
