@@ -11,3 +11,8 @@ type Order_item struct {
 type OrderItemURI struct {
 	ID uint `uri:"id" binding:"required,number"`
 }
+
+type Order_itemPost struct {
+	Quantity float64 `json:"quantity"`
+	Price    float64 `json:"price"`
+}

@@ -6,5 +6,5 @@ type Category struct {
 }
 
 type CategoryURI struct {
-	ID uint
+	ID uint `uri:"id" binding:"required,number"`
 }

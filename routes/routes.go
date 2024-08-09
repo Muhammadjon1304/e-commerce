@@ -18,7 +18,7 @@ func ProductRoutes(router *gin.Engine, ctrl *controllers.ProductController) {
 	router.POST("/products", middlewares.AdminMiddleware(), ctrl.AddProduct)
 	router.PUT("/products/:id", middlewares.AdminMiddleware(), ctrl.UpdateProduct)
 	router.DELETE("/products/:id", middlewares.AdminMiddleware(), ctrl.DeleteProduct)
-	router.POST("/products/:id/categories/:id", middlewares.AdminMiddleware(), ctrl.AddCategory)
+	router.POST("/products/:product_id/categories/:id", middlewares.AdminMiddleware(), ctrl.AddCategory)
 	router.DELETE("/products/:id/categories/:id", middlewares.AdminMiddleware(), ctrl.DeleteCategory)
 }
 

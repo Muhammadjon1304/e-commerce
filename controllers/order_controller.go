@@ -75,11 +75,11 @@ func (o *OrderController) GetOrderDetails(c *gin.Context) {
 
 func (o *OrderController) GetAllOrderItems(c *gin.Context) {
 	db := o.DB
-	username, exist := c.Get("username")
+	_, exist := c.Get("username")
 	if exist {
+		var OrderID models.OrderURI
 		repository := repositories.NewOrderRepository(db)
-		userID := repository.GetUserIDByUsername(username.(string))
-		items := repository.GetOrderItems(userID)
+		items := repository.GetOrderItems(OrderID.ID)
 		c.JSON(200, gin.H{"order_items": items})
 	}
 }

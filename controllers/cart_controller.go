@@ -77,52 +77,91 @@ func (c *CartController) AddItemToCart(ctx *gin.Context) {
 func (c *CartController) UpdateCartItem(ctx *gin.Context) {
 	db := c.DB
 	username, exist := ctx.Get("username")
-	if exist {
-		repository := repositories.NewCartRepository(db)
-		var cartItem models.PostCartItem
-		err := ctx.ShouldBindJSON(&cartItem)
-		fmt.Println(err)
-		if err == nil {
-			var itemID models.CartItemURI
-			err = ctx.ShouldBindUri(itemID)
-			if err == nil {
-				userID := repository.GetUserIDByUsername(username.(string))
-				cartID, err := repository.CheckExistingCart(userID)
-				if cartID != 0 && err == nil {
-					cartItem := repository.UpdateCartItem(cartID, itemID.ID, cartItem)
-					if (cartItem != models.CartItem{}) {
-						ctx.JSON(200, gin.H{"status": "success", "message": "item updated"})
-						return
-					} else {
-						ctx.JSON(500, gin.H{"status": "fail", "message": "item not updated"})
-						return
-					}
-				}
-			}
-		}
+	if !exist {
+		ctx.JSON(401, gin.H{"status": "fail", "message": "unauthorized"})
+		return
 	}
+
+	repository := repositories.NewCartRepository(db)
+
+	var cartItem models.PostCartItem
+	if err := ctx.ShouldBindJSON(&cartItem); err != nil {
+		ctx.JSON(400, gin.H{"status": "fail", "message": "invalid JSON"})
+		return
+	}
+
+	var itemID models.CartItemURI
+	if err := ctx.ShouldBindUri(&itemID); err != nil {
+		ctx.JSON(400, gin.H{"status": "fail", "message": "invalid URI"})
+		return
+	}
+
+	userID := repository.GetUserIDByUsername(username.(string))
+	if userID == 0 {
+		ctx.JSON(404, gin.H{"status": "fail", "message": "user not found"})
+		return
+	}
+
+	cartID, err := repository.CheckExistingCart(userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{"status": "fail", "message": "error checking cart"})
+		return
+	}
+
+	if cartID == 0 {
+		ctx.JSON(404, gin.H{"status": "fail", "message": "cart not found"})
+		return
+	}
+
+	updatedCartItem := repository.UpdateCartItem(cartID, itemID.ID, cartItem)
+	if (updatedCartItem == models.CartItem{}) {
+		ctx.JSON(500, gin.H{"status": "fail", "message": "item not updated"})
+		return
+	}
+
+	ctx.JSON(200, gin.H{"status": "success", "message": "item updated"})
 }
 
 func (c *CartController) DeleteCartItem(ctx *gin.Context) {
 	db := c.DB
 	username, exist := ctx.Get("username")
-	if exist {
-		repository := repositories.NewCartRepository(db)
 
-		var itemID models.CartItemURI
-		if err := ctx.ShouldBindUri(&itemID); err != nil {
-			userID := repository.GetUserIDByUsername(username.(string))
-			cartID, err := repository.CheckExistingCart(userID)
-			if cartID != 0 && err != nil {
-				deleted := repository.DeleteCartItem(itemID.ID, cartID)
-				if deleted {
-					ctx.JSON(200, gin.H{"status": "success", "message": "item deleted"})
-					return
-				} else {
-					ctx.JSON(500, gin.H{"status": "fail", "message": "item not deleted"})
-					return
-				}
-			}
-		}
+	if !exist {
+		ctx.JSON(401, gin.H{"status": "fail", "message": "unauthorized"})
+		return
 	}
+
+	repository := repositories.NewCartRepository(db)
+
+	var ItemID models.CartItemURI
+
+	if err := ctx.ShouldBindUri(&ItemID); err != nil {
+		ctx.JSON(400, gin.H{"status": "fail", "message": "invalid uri"})
+		return
+	}
+
+	userID := repository.GetUserIDByUsername(username.(string))
+	if userID == 0 {
+		ctx.JSON(404, gin.H{"status": "fail", "message": "user not found"})
+		return
+	}
+
+	cartID, err := repository.CheckExistingCart(userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{"status": "fail", "message": "error checking cart"})
+		return
+	}
+
+	if cartID == 0 {
+		ctx.JSON(404, gin.H{"status": "fail", "message": "cart not found"})
+		return
+	}
+
+	deleted := repository.DeleteCartItem(ItemID.ID, cartID)
+	if !deleted {
+		ctx.JSON(404, gin.H{"status": "fail", "message": "cart not deleted"})
+		return
+	}
+	ctx.JSON(200, gin.H{"status": "success", "message": "item deleted"})
+	return
 }

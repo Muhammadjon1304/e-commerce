@@ -88,7 +88,7 @@ func (c *CartRepository) DeleteCartItem(id, cart_id uint) bool {
 }
 
 func (c *CartRepository) UpdateCartItem(cartID, id uint, cart_item models.PostCartItem) models.CartItem {
-	_, err := c.DB.Exec("UPDATE cart_items SET product_id=$1,quantity=$2 WHERE cart_id=$3 AND id=4", cart_item.Product_id, cart_item.Quantity, cartID, id)
+	_, err := c.DB.Exec("UPDATE cart_items SET product_id=$1,quantity=$2 WHERE cart_id=$3 AND id=$4", cart_item.Product_id, cart_item.Quantity, cartID, id)
 	if err != nil {
 		log.Fatal(err)
 		return models.CartItem{}

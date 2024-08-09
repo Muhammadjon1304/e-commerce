@@ -12,3 +12,7 @@ type Product struct {
 type ProductURI struct {
 	ID uint `uri:"id" binding:"required,number"`
 }
+
+type ProductURICategory struct {
+	ID uint `uri:"product_id" binding:"required,number"`
+}
