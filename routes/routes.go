@@ -19,7 +19,7 @@ func ProductRoutes(router *gin.Engine, ctrl *controllers.ProductController) {
 	router.PUT("/products/:id", middlewares.AdminMiddleware(), ctrl.UpdateProduct)
 	router.DELETE("/products/:id", middlewares.AdminMiddleware(), ctrl.DeleteProduct)
 	router.POST("/products/:product_id/categories/:id", middlewares.AdminMiddleware(), ctrl.AddCategory)
-	router.DELETE("/products/:id/categories/:id", middlewares.AdminMiddleware(), ctrl.DeleteCategory)
+	router.DELETE("/products/delete/:product_id/categories/:id", middlewares.AdminMiddleware(), ctrl.DeleteCategory)
 }
 
 func CategoryRoutes(router *gin.Engine, ctrl *controllers.CategoryController) {

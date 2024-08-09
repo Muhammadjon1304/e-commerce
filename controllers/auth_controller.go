@@ -19,6 +19,19 @@ func NewUserController(db *sql.DB) UserController {
 		DB: db,
 	}
 }
+
+// Register godoc
+// @Summary Register a new user
+// @Description Register a new user with the input payload
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param   user  body   models.User  true  "User JSON"
+// @Success 200 {object} gin.H{"status": "success", "msg": "user created"}
+// @Failure 400 {object} gin.H{"Error": "Bad Request"}
+// @Failure 500 {object} gin.H{"status": "fail", "msg": "user not created"}
+// @Router /users/register [post]
+
 func (u *UserController) Register(ctx *gin.Context) {
 	db := u.DB
 	var user models.User

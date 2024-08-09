@@ -111,18 +111,6 @@ func (o *ProductController) AddCategory(c *gin.Context) {
 		return
 	}
 
-	exist, err := repository.CheckCategoryProductRelationship(productID.ID, categoryID.ID)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error checking relationship"})
-		return
-	}
-
-	if !exist {
-		c.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No such category or product"})
-		return
-	}
-
 	if added := repository.AddCategoryToProduct(productID.ID, categoryID.ID); added {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Category added"})
 	} else {
@@ -132,30 +120,23 @@ func (o *ProductController) AddCategory(c *gin.Context) {
 
 func (o *ProductController) DeleteCategory(c *gin.Context) {
 	db := o.DB
-	var ProductID models.ProductURI
-	var CategoryID models.CategoryURI
-
-	if err := c.ShouldBindUri(&ProductID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-	}
-	if err := c.ShouldBindUri(&CategoryID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-	}
 	repository := repositories.NewCategoryRepository(db)
-	exist, err := repository.CheckCategoryProductRelationship(ProductID.ID, CategoryID.ID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
-	}
-	if exist {
-		if deleted := repository.DeleteCategoryProductRelationship(ProductID.ID, CategoryID.ID); deleted {
-			c.JSON(200, gin.H{"status": "success", "message": "category added"})
-			return
-		} else {
-			c.JSON(300, gin.H{"status": "fail", "message": "can't add category"})
-			return
-		}
-	} else {
-		c.JSON(300, gin.H{"status": "fail", "message": "No this kind of category or product"})
+	var productID models.ProductURICategory
+	var categoryID models.CategoryURI
+
+	if err := c.ShouldBindUri(&productID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid product ID"})
 		return
+	}
+
+	if err := c.ShouldBindUri(&categoryID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid category ID"})
+		return
+	}
+
+	if deleted := repository.DeleteCategoryProductRelationship(productID.ID, categoryID.ID); deleted {
+		c.JSON(http.StatusOK, gin.H{"status": "success", "message": "Category added"})
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": "fail", "message": "Can't add category"})
 	}
 }

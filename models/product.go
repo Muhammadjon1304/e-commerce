@@ -16,3 +16,7 @@ type ProductURI struct {
 type ProductURICategory struct {
 	ID uint `uri:"product_id" binding:"required,number"`
 }
+
+type CategoryURIProduct struct {
+	ID uint `uri:"category_id" binding:"required,number"`
+}

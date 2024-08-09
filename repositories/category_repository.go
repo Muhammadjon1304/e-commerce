@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/muhammadjon1304/e-commerce/models"
 	"log"
 )
@@ -62,7 +63,7 @@ func (c *CategoryRepository) DeleteCategory(id uint) bool {
 }
 
 func (c *CategoryRepository) AddCategoryToProduct(product_ID uint, category_id uint) bool {
-	stmt, err := c.DB.Prepare("INSERT INTO prduct_categories(product_id,category_id)")
+	stmt, err := c.DB.Prepare("INSERT INTO product_categories(product_id,category_id) values($1,$2) ")
 	if err != nil {
 		log.Fatal(err)
 		return false
@@ -79,21 +80,22 @@ func (c *CategoryRepository) AddCategoryToProduct(product_ID uint, category_id u
 var db *sql.DB
 
 func (c *CategoryRepository) CheckCategoryProductRelationship(productId, categoryId uint) (bool, error) {
+	if c.DB == nil {
+		return false, errors.New("database connection is not initialized")
+	}
+
 	var dummyID uint
 	query := `SELECT product_id FROM product_categories WHERE product_id = $1 AND category_id = $2`
 
-	err := db.QueryRow(query, productId, categoryId).Scan(&dummyID)
+	err := c.DB.QueryRow(query, productId, categoryId).Scan(&dummyID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			// No rows found, return false with no error
+		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
-		// Some other error occurred during the query execution
 		log.Printf("Error checking category-product relationship: %v", err)
 		return false, err
 	}
 
-	// If no error and the row exists
 	return true, nil
 }
 
