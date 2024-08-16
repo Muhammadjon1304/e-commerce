@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/muhammadjon1304/e-commerce/config"
 	"github.com/muhammadjon1304/e-commerce/controllers"
+	_ "github.com/muhammadjon1304/e-commerce/docs"
 	"github.com/muhammadjon1304/e-commerce/routes"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -13,22 +14,6 @@ import (
 // @title E-Commerce API
 // @version 1.0
 // @description This is a sample server for an e-commerce application.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host localhost:8080
-// @BasePath /
-
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
-
 func main() {
 	_ = godotenv.Load()
 	db := config.ConnectDB()
@@ -43,9 +28,10 @@ func main() {
 	routes.CategoryRoutes(router, &CategoryController)
 	routes.OrderRoutes(router, &OrderController)
 	routes.CartRoutes(router, &CartController)
-	router.Run(":8080")
 
 	// Swagger route
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.Run(":8080")
 
 }
